@@ -8,6 +8,8 @@ Kiril Mitov, CTO Axlessoft, October 2020
 
 (On the state of the JavaScript community; author Unknown; date: beginning of 21 century)
 
+# Table of contents
+
 <!-- MarkdownTOC autolink="true" autoanchor="true" -->
 
 - [Demonstration on how it works and how we protect our Intellectual property](#demonstration-on-how-it-works-and-how-we-protect-our-intellectual-property)
