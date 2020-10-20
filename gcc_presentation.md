@@ -4,6 +4,11 @@
 
 Kiril Mitov (kmitov [at] axlessoft [dot] com), CTO Axlessoft, October 2020 
 
+Get in touch or follow me:
+
+[twitter/thebravoman](https://twitter.com/thebravoman)
+[linkedin/kirilmitov](https://www.linkedin.com/in/kirilmitov/)
+
 # Quote to begin with 
 
 > "If the human body was making a new organ every week, doctors would be googling this shit."
