@@ -53,11 +53,16 @@ In about a year between 2019-2020 I went from occasionally working with JavaScri
     - [Invalid syntax](#invalid-syntax)
     - [A lot of other checks even before reaching the browser.](#a-lot-of-other-checks-even-before-reaching-the-browser)
 - [How the size of the output is reduced by GCC](#how-the-size-of-the-output-is-reduced-by-gcc)
+- [Real world compiled code](#real-world-compiled-code)
+    - [Example 1 from IS](#example-1-from-is)
+    - [Example 2 from IS](#example-2-from-is)
+    - [Example 3 from IS](#example-3-from-is)
+    - [Conclusion](#conclusion)
 - [How we build the Instructions Steps \(IS\) Framework](#how-we-build-the-instructions-steps-is-framework)
-    - [Building an SDK - @export the classes](#building-an-sdk---export-the-classes)
-        - [Building and SDK - @export the methods](#building-and-sdk---export-the-methods)
+    - [Building an SDK](#building-an-sdk)
+        - [@export the classes](#export-the-classes)
+        - [@export the methods](#export-the-methods)
     - [Drawback of using @export](#drawback-of-using-export)
-- [Externs](#externs)
 
 <!-- /MarkdownTOC -->
 
@@ -776,11 +781,90 @@ We deliver JavaScript, compiled with GCC in ADVANCED_OPTIMIZATION mode
  - there is a new GCC version every 3 weeks
  - the compiler is called 'gcc'. It is pleasing and fun to work with JavaScript and talk about 'gcc' and to remember the glorious times :)
 
+<a id="real-world-compiled-code"></a>
+# Real world compiled code
+
+<a id="example-1-from-is"></a>
+## Example 1 from IS
+
+I have not idea what this code does and what is the original code.
+
+```javascript
+    function Sa(b) {
+        var c = {
+            stepsTreeLoaded: !0,
+            Cb: !1
+        };
+        v(c);
+        var d = [];
+        b.a.forEach(function(e) {
+            a: {
+                for (f in c)
+                    if (1 != c[f] || !Ta(b.c, e, f))
+                        if (0 != c[f] || void 0 != Ta(b.c, e, f)) {
+                            var f = !1;
+                            break a
+                        }
+                f = !0
+            }
+            f && d.push(e)
+        });
+        return d
+    }
+```
+
+<a id="example-2-from-is"></a>
+## Example 2 from IS
+
+I also have no idea what whis code does, but I love the call 'this.a.a' :)
+
+```javascript
+n.Rb = function(b) {
+    b = b.a;
+    var c = y(this.a),
+        d = new x(this.c);
+    c && d.next(za(this.c, c.s()) + 1);
+    c = 0 < b ? 1 : -1;
+    for (var e = Math.abs(b), f = this.a.a; d.W(c) && 0 < e;) d.next(c), Bb(this, y(d)) || (e--, f = d.a);
+    d = f - this.a.a;
+    c = y(this.a);
+    b = 0 < b ? 1 : -1;
+    0 < Math.abs(d) && (this.a.next(d), b = new tb(y(this.a), c, d, b), D(this.l(), {
+        ha: b
+    }))
+};
+```
+
+<a id="example-3-from-is"></a>
+## Example 3 from IS
+
+What a nice for statement
+
+```javascript
+function Fb(b) {
+    var c = b.i.a();
+    if (0 == b.j.length) return c;
+    var d = 0,
+        e = new x(b.i);
+    b.c = [];
+    for (var f = 0; e.W(1);) c = b.Ia(e.next(1)), d += c ? 0 : 1, c && f++, 0 < f && !c && (b.c.push([e.a, f]), f = 0);
+    return d
+}
+```
+
+<a id="conclusion"></a>
+## Conclusion
+
+Don't look at the GCC code and try to write your code in an "pseudo-optimized" way because the compiler does so. Develop the code as readable, understandable and maintainable, and leave the optimization to GCC.
+
 <a id="how-we-build-the-instructions-steps-is-framework"></a>
 # How we build the Instructions Steps (IS) Framework
 
-<a id="building-an-sdk---export-the-classes"></a>
-## Building an SDK - @export the classes
+<a id="building-an-sdk"></a>
+## Building an SDK
+
+<a id="export-the-classes"></a>
+### @export the classes
 
 GCC will remove all the methods that are not called. But if you are building an SDK and would like to provide others with your GCC compiled library most of the methods will not be called. You are providing a library and this library will be used by the clients. Not all the methods will be called by every clients.
 
@@ -917,8 +1001,8 @@ processor.process()
 u.a();
 ```
 
-<a id="building-and-sdk---export-the-methods"></a>
-### Building and SDK - @export the methods
+<a id="export-the-methods"></a>
+### @export the methods
 
 If we provide the library to another person they will not be able to call 
 'process()' as the name of the method was changed. 
@@ -1067,9 +1151,6 @@ $ du -b is-release_pack-sdk-1.1.209.js
 | IS production | IS SDK    |
 | ------------- | ----------|
 | 121857        | 158442    |
-| 100%          | 130,02    |
+| 100%          | 130,02%   |
 
 With all the exports the size of the code grows to to about 30% more, but still less than the Uglify JS code.
-
-<a id="externs"></a>
-# Externs
