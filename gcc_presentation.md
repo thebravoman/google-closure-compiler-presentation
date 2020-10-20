@@ -738,7 +738,7 @@ $ du is-release_pack-b65ffd509871e122b72cbdfa93e96c47cea2ac0c64b83016bf3b0df14cd
 586230  is-release_pack-b65ffd509871e122b72cbdfa93e96c47cea2ac0c64b83016bf3b0df14cd99a86.js
 ```
 
-**586230 bytes** (586K)
+**586230 bytes**
 
 2. Number of lines 
 
@@ -760,7 +760,7 @@ $ du is-release_pack-1ce088d0e0f412a627779c10d1248ac0481ea4f687f18e712261c8d2963
 204 is-release_pack-1ce088d0e0f412a627779c10d1248ac0481ea4f687f18e712261c8d29630b7cc.js
 ```
 
-**196964 bytes** (197K)
+**196964 bytes**
 
 4. Google Closure Compiler ADVANCED_OPTIMIZATION
 
@@ -769,7 +769,7 @@ $ du -b is-release_pack-1.1.209.js
 121857  is-release_pack-1.1.209.js
 ```
 
-**121857 bytes** (122K)
+**121857 bytes** 
 
 5. Results
 
@@ -1155,7 +1155,7 @@ $ du -b is-release_pack-sdk-1.1.209.js
 158442  is-release_pack-sdk-1.1.209.js
 ```
 
-**158442** bytes (158K)
+**158442 bytes**
 
 | IS production | IS SDK    |
 | ------------- | ----------|
