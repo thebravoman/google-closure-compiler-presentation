@@ -50,7 +50,13 @@ We compile Javascript to Javascript. The compiler has two modes. SIMPLE and ADVA
 
 <a id="example-1---output"></a>
 ## Example 1 - output
-example1.js
+
+```javascript
+function output(n) {
+  console.log(`called with ${n}`)
+}
+output(7);
+```
 
 <a id="simple_optimization"></a>
 ## SIMPLE_OPTIMIZATION
@@ -76,6 +82,13 @@ function output(a) {
 output(7);
 ```
 
+1. Резултатът е минифициран
+2. Променливата 'n' вече е с друго име - 'a'
+3. Кодът може да се изпълнява и на по-стари браузъри
+4. Има малко повече код служебен код в началато, който не е толкова интересен
+5. Компилаторът се пуска с java. Има java версия има и javascript версия на компилатора. Версията която аз използваме е 20200830.
+6. https://mvnrepository.com/artifact/com.google.javascript/closure-compiler с първа версия  Dec, 2010 като последните години имат нова версия на всеки 3 седмици
+
 <a id="advanced_optimization"></a>
 ## ADVANCED_OPTIMIZATION
 
@@ -90,9 +103,49 @@ $ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED exampl
 console.log("called with 7")
 ```
 
+1. Кодът не е просто минифиран.
+2. Липсва фунцията output. Тя не ни трябва. За браузъра няма значение дали ще има такава функция или не. И в двата случая той ще изкара изпише стринг в конзолата
+3. Няма дефиниця, няма параметър, няма извикване. Директно е свършена работата.
+4. Как сте запазили интелектуалната собственост - ами в компилирания код отсъства разработеният от вас код.
+5. Извикването е по-бързо - няма извикване на функция, няма събиране на низ с число
+6. Взима по-малко памет - една функция по-малко
+7. Въпреки това поведението е запазено.
+
 <a id="example-2---classes"></a>
 ## Example 2 - classes
-example2.js
+
+```javascript
+/**
+ * Process all the elements with element name and add the css class to this element.
+ * Used as an example in a Google Closure Compiler presentation
+ *
+ * @example
+ * Given an page that contains
+ * <div></div>
+ *
+ * When the processor is constructed and executed as
+ *
+ * const processor = new Processor("div", "my-class")
+ * processor.process()
+ *
+ * <div class="my-class"></div>
+ *
+ * @author Kiril Mitov
+ */
+class Processor {
+  constructor(elementName, cssClassToAdd) {
+    this._elementName = elementName;
+    this._cssClassToAdd = cssClassToAdd;
+  }
+
+  process() {
+    const elements= document.querySelectorAll(this._elementName)
+    elements.forEach((element)=> {
+      element.classList.add(this._cssClassToAdd)
+    })
+  }
+}
+```
 
 ```bash
 $ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example2.js 
@@ -112,6 +165,8 @@ $ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED exampl
 We add
 
 ```javascript
+
+// add this fragment at the bottom at the second example
 const processor = new Processor("div", "my-class")
 processor.process()
 ```
@@ -153,7 +208,88 @@ document.querySelectorAll("div").forEach(function(a) {
 <a id="example-3---inheritance"></a>
 ## Example 3 - inheritance
 
-example3.js
+```javascript
+/**
+ * Two processors with inheritance along with a function that is calling them.
+ *
+ */
+/**
+ * Base class for all processors
+ * @author Kiril Mitov
+ */
+class Processor {
+  constructor(elementName, cssClassToAdd) {
+    this._elementName = elementName;
+    this._cssClassToAdd = cssClassToAdd;
+  }
+
+}
+
+/**
+ * Adds a css class to DOM elements
+ *
+ * @example
+ * Given an page that contains
+ * <div></div>
+ *
+ * When the processor is constructed and executed as
+ *
+ * const processor = new AddProcessor("div", "my-class")
+ * processor.process()
+ *
+ * <div class="my-class"></div>
+ *
+ */
+class AddProcessor extends Processor {
+  constructor(elementName, cssClassToAdd) {
+    super(elementName, cssClassToAdd)
+  }
+
+  process() {
+    const elements= document.querySelectorAll(this._elementName)
+    elements.forEach((element)=> {
+      element.classList.add(this._cssClassToAdd)
+    })
+  }
+}
+
+/**
+ * Removes a css class from DOM elements
+ *
+ * @example
+ * Given an page that contains
+ * <div class='my-class'></div>
+ *
+ * When the processor is constructed and executed as
+ *
+ * const processor = new RemoveProcessor("div", "my-class")
+ * processor.process()
+ *
+ * <div></div>
+ */
+class RemoveProcessor extends Processor {
+
+  constructor(elementName, cssClassToAdd) {
+    super(elementName, cssClassToAdd)
+  }
+
+  process() {
+    const elements= document.querySelectorAll(this._elementName)
+    elements.forEach((element)=> {
+      element.classList.remove(this._cssClassToAdd)
+    })
+  }
+}
+
+let processor = null;
+if(document.getElementById("addProcessor")) {
+  processor = new AddProcessor("div", "my-class")
+} else {
+  processor = new RemoveProcessor("div", "my-class")
+}
+processor.process()
+
+```
 
 ```bash
 $ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example3.js
@@ -408,7 +544,6 @@ class RemoveProcessor extends Processor {
   }
 }
 
-...
 // we call the constructor method with a wrong type.
 processor = new RemoveProcessor("div", 4)
 
@@ -436,7 +571,6 @@ https://github.com/google/closure-compiler/wiki/Types-in-the-Closure-Type-System
 Какво ще стане ако се опитаме да извикаме метод който вече не съществува
 
 ```javascript
-...
 // we call .anotherMethod and .process()
 // .anotherMethod does not exist and is not defined
 processor.anotherMethod()
@@ -453,7 +587,6 @@ example5.js:83:10: WARNING - [JSC_INEXISTENT_PROPERTY] Property anotherMethod ne
 ## Invalid syntax
 
 ```javascript
-...
 // this code can not be compiled. It is not a valid JavaScript
   process() {
     const elements= document.querySelectorAll(this._elementName)
@@ -524,7 +657,7 @@ $ du -b is-release_pack-1.1.209.js
 | --------- | --------- | ---------
 | 586230    |  196964   |   121857
 | 100%      |  33.59%   |   20,78% of original
-            |           |   61,86% of Uglify
+|           |           |   61,86% of Uglify
 
 Доставяме JavaScript, компилиран с GCC, ADVANCED_OPTIMIZATION
  - който и да ни откраднеш, ще ти е трудно да изградиш продукт върху него
