@@ -2,11 +2,28 @@
 
  or How do we maintain our mental stability when developing in JavaScript.
 
-Kiril Mitov, CTO Axlessoft, October 2020 
+Kiril Mitov (kmitov [at] axlessoft [dot] com), CTO Axlessoft, October 2020 
+
+# Quote to begin with 
 
 > "If the human body was making a new organ every week, doctors would be googling this shit."
 
 (On the state of the JavaScript community; author Unknown; date: beginning of 21 century)
+
+# Organization Context
+
+We used Google Closure Compiler in the development of the Instructions Steps (IS) framework. IS helped us build buildin3d.com and visualize 3D assembly instructions to end clients. IS has an event-driven plug-in architecture. It consists of 68 plugins. Every plugin is a separate repo with separate release cycle, build and version. Every plugin is written in JavaScript. In total we've released more than 3000 versions of the plugins. The framework is vanialla JS, not event dependent on DOM not to mention jQuery or others. Some extensions depend on Babylon.js, Three.js, Mustache.js and others.
+
+The tools that we used every day   
+
+1. Google Closure Compiler  - no code reaches production if it is not compiled.
+2. Sprockets for packging (deprecated currently, but is working very nice.)
+3. Teaspoon for running specs (the project is looking for maintainers, probably we would take it)
+4. Jasmine for developing specs (a healthy specs framework)
+
+# Personal context
+
+In about a year between 2019-2020 I went from occasionally working with JavaScript when I had to, to one of the very best JavaScript programmers I know of. I hated most steps of the way. At least most steps until I decided to start version 6 of the framework where I completely rewrote it all dropping a lot and basing the framework on vanilla js with es6 classes and no depending even on the DOM. In retrospective GCC was the tool that helped me the most.
 
 # Table of contents
 
@@ -37,6 +54,10 @@ Kiril Mitov, CTO Axlessoft, October 2020
     - [A lot of other checks even before reaching the browser.](#a-lot-of-other-checks-even-before-reaching-the-browser)
 - [How the size of the output is reduced by GCC](#how-the-size-of-the-output-is-reduced-by-gcc)
 - [How we build the Instructions Steps \(IS\) Framework](#how-we-build-the-instructions-steps-is-framework)
+    - [Building an SDK - @export the classes](#building-an-sdk---export-the-classes)
+        - [Building and SDK - @export the methods](#building-and-sdk---export-the-methods)
+    - [Drawback of using @export](#drawback-of-using-export)
+- [Externs](#externs)
 
 <!-- /MarkdownTOC -->
 
@@ -757,3 +778,298 @@ We deliver JavaScript, compiled with GCC in ADVANCED_OPTIMIZATION mode
 
 <a id="how-we-build-the-instructions-steps-is-framework"></a>
 # How we build the Instructions Steps (IS) Framework
+
+<a id="building-an-sdk---export-the-classes"></a>
+## Building an SDK - @export the classes
+
+GCC will remove all the methods that are not called. But if you are building an SDK and would like to provide others with your GCC compiled library most of the methods will not be called. You are providing a library and this library will be used by the clients. Not all the methods will be called by every clients.
+
+This is what export is for. 
+
+Let's provide our Add and Remove Processors as a library for others to use.
+
+We add the @export annotation
+
+```javascript
+// example3_with_exports.js
+// 
+// Adding @export to the classes
+// 
+/**
+ * @export
+ * @author Kiril Mitov
+ */
+class Processor {
+  constructor(elementName, cssClassToAdd) {
+    this._elementName = elementName;
+    this._cssClassToAdd = cssClassToAdd;
+  }
+
+  process() {
+    throw new Error("Unimplemented")
+  }
+}
+
+/**
+ * @export
+ */
+class AddProcessor extends Processor {
+  constructor(elementName, cssClassToAdd) {
+    super(elementName, cssClassToAdd)
+  }
+
+  process() {
+    const elements= document.querySelectorAll(this._elementName)
+    elements.forEach((element)=> {
+      element.classList.add(this._cssClassToAdd)
+    })
+  }
+}
+
+/**
+ * @export
+ */
+class RemoveProcessor extends Processor {
+
+  constructor(elementName, cssClassToAdd) {
+    super(elementName, cssClassToAdd)
+  }
+
+  process() {
+    const elements= document.querySelectorAll(this._elementName)
+    elements.forEach((element)=> {
+      element.classList.remove(this._cssClassToAdd)
+    })
+  }
+}
+let processor = null;
+if(document.getElementById("addProcessor")) {
+  processor = new AddProcessor("div", "my-class")
+} else {
+  processor = new RemoveProcessor("div", "my-class")
+}
+processor.process()
+```
+
+To compile we must include two new options:
+
+1. --generate_exports
+2. --js closure/goog/base.js - we must download closure/goog/base to the current folder
+
+```bash
+$ java -jar closure-compiler-v20200830.jar -O ADVANCED --generate_exports --js closure/goog/base.js example3_with_exports.js
+```
+
+The compiled file is
+
+```javascript
+//...more
+function q(a, b) {
+    this.c = a;
+    this.b = b
+}
+q.prototype.a = function() {
+    throw Error("Unimplemented");
+};
+p("Processor", q);
+
+function r(a, b) {
+    q.call(this, a, b)
+}
+m(r, q);
+r.prototype.a = function() {
+    var a = this;
+    document.querySelectorAll(this.c).forEach(function(b) {
+        b.classList.add(a.b)
+    })
+};
+p("AddProcessor", r);
+
+function t(a, b) {
+    q.call(this, a, b)
+}
+m(t, q);
+t.prototype.a = function() {
+    var a = this;
+    document.querySelectorAll(this.c).forEach(function(b) {
+        b.classList.remove(a.b)
+    })
+};
+p("RemoveProcessor", t);
+var u = null;
+document.getElementById("addProcessor") ? u = new r("div", "my-class") : u = new t("div", "my-class");
+u.a();
+```
+
+What you could wee is that it we have the names 'Processor', 'AddProcessor' and 'RemoveProcessor' available as named variabled in the file in we could give someone this file and they can use it to call
+
+```javascript
+const processor = new AddProcessor()
+processor.process()
+```
+
+The problem is that the method 'process' is not exported. So it is not an API. It's name was mangled by GCC and was changed to "a()" 
+
+```javascript
+//  original
+processor.process()
+//  compiled
+u.a();
+```
+
+<a id="building-and-sdk---export-the-methods"></a>
+### Building and SDK - @export the methods
+
+If we provide the library to another person they will not be able to call 
+'process()' as the name of the method was changed. 
+
+We must @export also the method.
+
+```javascript
+// example3_with_exports_and_exported_process_method.js
+// 
+// Adding @export to the classes and to the process method
+// 
+/**
+ * @export
+ * @author Kiril Mitov
+ */
+class Processor {
+  constructor(elementName, cssClassToAdd) {
+    this._elementName = elementName;
+    this._cssClassToAdd = cssClassToAdd;
+  }
+
+  process() {
+    throw new Error("Unimplemented")
+  }
+}
+
+/**
+ * @export
+ */
+class AddProcessor extends Processor {
+  constructor(elementName, cssClassToAdd) {
+    super(elementName, cssClassToAdd)
+  }
+
+  process() {
+    const elements= document.querySelectorAll(this._elementName)
+    elements.forEach((element)=> {
+      element.classList.add(this._cssClassToAdd)
+    })
+  }
+}
+
+/**
+ * @export
+ */
+class RemoveProcessor extends Processor {
+
+  constructor(elementName, cssClassToAdd) {
+    super(elementName, cssClassToAdd)
+  }
+
+  process() {
+    const elements= document.querySelectorAll(this._elementName)
+    elements.forEach((element)=> {
+      element.classList.remove(this._cssClassToAdd)
+    })
+  }
+}
+let processor = null;
+if(document.getElementById("addProcessor")) {
+  processor = new AddProcessor("div", "my-class")
+} else {
+  processor = new RemoveProcessor("div", "my-class")
+}
+processor.process()
+
+```
+
+```bash
+$ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED --generate_exports --js /home/kireto/axles/code/is-gcc_tools/vendor/assets/javascripts/closure/goog/base.js example3_with_exports_and_exported_process_method.js
+
+```
+
+The compiled file is 
+
+```javascript
+// ... more
+function q(a, b) {
+    this.b = a;
+    this.a = b
+}
+q.prototype.process = function() {
+    throw Error("Unimplemented");
+};
+p("Processor", q);
+q.prototype.process = q.prototype.process;
+
+function r(a, b) {
+    q.call(this, a, b)
+}
+m(r, q);
+r.prototype.process = function() {
+    var a = this;
+    document.querySelectorAll(this.b).forEach(function(b) {
+        b.classList.add(a.a)
+    })
+};
+p("AddProcessor", r);
+
+function t(a, b) {
+    q.call(this, a, b)
+}
+m(t, q);
+t.prototype.process = function() {
+    var a = this;
+    document.querySelectorAll(this.b).forEach(function(b) {
+        b.classList.remove(a.a)
+    })
+};
+p("RemoveProcessor", t);
+var u = null;
+document.getElementById("addProcessor") ? u = new r("div", "my-class") : u = new t("div", "my-class");
+u.process();
+```
+
+What you can see are two new things in this file
+
+```javascript
+p("Processor", q);
+q.prototype.process = q.prototype.process;
+
+// ...
+document.getElementById("addProcessor") ? u = new r("div", "my-class") : u = new t("div", "my-class");
+u.process();
+```
+
+1. There is a method 'q.prototype.process'
+2. The call is no londer 'u.a()', but is 'u.process()'
+
+<a id="drawback-of-using-export"></a>
+## Drawback of using @export
+
+> 'Ideally, the ratio of external symbols to internal code in a binary should be as small as possible. The compiler is much more effective as the "volume" of code increases in comparison to its "surface".'
+
+(Nick Reid, Closure Compiler Discuss, April 2020)
+
+Here is the stats for our Instructions Steps Framework with and without SDK for the size. 
+
+```bash
+$ du -b is-release_pack-sdk-1.1.209.js 
+158442  is-release_pack-sdk-1.1.209.js
+```
+
+**158442** bytes (158K)
+
+| IS production | IS SDK    |
+| ------------- | ----------|
+| 121857        | 158442    |
+| 100%          | 130,02    |
+
+With all the exports the size of the code grows to to about 30% more, but still less than the Uglify JS code.
+
+<a id="externs"></a>
+# Externs
