@@ -12,48 +12,57 @@ Kiril Mitov, CTO Axlessoft, October 2020
 
 <!-- MarkdownTOC autolink="true" autoanchor="true" -->
 
-- [Demonstration on how it works and how we protect our Intellectual property](#demonstration-on-how-it-works-and-how-we-protect-our-intellectual-property)
-    - [Example 1 - output](#example-1---output)
-    - [SIMPLE_OPTIMIZATION](#simple_optimization)
-        - [SIMPLE_OPTIMIZATIONS compiled](#simple_optimizations-compiled)
-        - [SIMPLE_OPTIMIZATION compiled & formatted](#simple_optimization-compiled--formatted)
-    - [ADVANCED_OPTIMIZATION](#advanced_optimization)
-        - [ADVANCED_OPTIMIZATION compiled](#advanced_optimization-compiled)
-    - [Example 2 - classes](#example-2---classes)
+- [Demonstration on how GCC works and how we protect our Intellectual property](#demonstration-on-how-gcc-works-and-how-we-protect-our-intellectual-property)
+    - [Example 1 - 'output'](#example-1---output)
+        - [SIMPLE_OPTIMIZATION](#simple_optimization)
+            - [SIMPLE_OPTIMIZATION compiled](#simple_optimization-compiled)
+            - [SIMPLE_OPTIMIZATION compiled & formatted](#simple_optimization-compiled--formatted)
+        - [ADVANCED_OPTIMIZATION](#advanced_optimization)
+            - [ADVANCED_OPTIMIZATION compiled](#advanced_optimization-compiled)
+        - [Summary](#summary)
+    - [Example 2 - 'classes'](#example-2---classes)
         - [ADVANCED_OPTIMIZATION compiled](#advanced_optimization-compiled-1)
         - [Improve example 2](#improve-example-2)
         - [ADVANCED_OPTIMIZATION compiled again](#advanced_optimization-compiled-again)
         - [ADVANCED_OPTIMIZATION compiled again & beautified](#advanced_optimization-compiled-again--beautified)
-        - [What was changed](#what-was-changed)
+        - [Summary](#summary-1)
     - [Example 3 - inheritance](#example-3---inheritance)
         - [ADVANCED_OPTIMIZATION compiled](#advanced_optimization-compiled-2)
         - [ADVANCED_OPTIMIZATION compiled & beautified](#advanced_optimization-compiled--beautified)
-        - [Summary](#summary)
+        - [Summary](#summary-2)
 - [How did the errors disappear](#how-did-the-errors-disappear)
     - [Types](#types)
     - [Missing methods](#missing-methods)
     - [Invalid syntax](#invalid-syntax)
     - [A lot of other checks even before reaching the browser.](#a-lot-of-other-checks-even-before-reaching-the-browser)
-- [How the size of the output reduced](#how-the-size-of-the-output-reduced)
+- [How the size of the output is reduced by GCC](#how-the-size-of-the-output-is-reduced-by-gcc)
 - [How we build the Instructions Steps \(IS\) Framework](#how-we-build-the-instructions-steps-is-framework)
 
 <!-- /MarkdownTOC -->
 
-<a id="demonstration-on-how-it-works-and-how-we-protect-our-intellectual-property"></a>
-# Demonstration on how it works and how we protect our Intellectual property
+<a id="demonstration-on-how-gcc-works-and-how-we-protect-our-intellectual-property"></a>
+# Demonstration on how GCC works and how we protect our Intellectual property
 
-Google closure compiler is a compiler. It takes a source and compiles a target. Using the wikipedia definition 
-'In computing, a compiler is a computer program that translates computer code written in one programming language (the source language) into another language (the target language). ' 
+Google closure compiler is a compiler. It takes a source and compiles an output. Using the wikipedia definition 
 
-You can take a program in one language and produce a different language. Here is an example. 
-We compile Javascript to Javascript. The compiler has two modes. SIMPLE and ADVANCED.
+> 'In computing, a compiler is a computer program that translates computer code written in one programming language (the source language) into another language (the target language). ' 
 
-Ето един Javascript фрагмет
+You can take a program in one language and produce a different language. With Google Closure Compiler we compile JavaScript to JavaScript. The compiler has three modes of compilation - WHITESPACE, SIMPLE, ADVANCED
+
+To successfully run GCC you must first download it. 
+It is available at: https://mvnrepository.com/artifact/com.google.javascript/closure-compiler
+
+In this presentation I am using closure-compiler-v20200830. 
+
+You must have java to run the GCC compiler, but there is also a JavaScript implementation so you can use GCC without Java.
 
 <a id="example-1---output"></a>
-## Example 1 - output
+## Example 1 - 'output'
+
+The code writes 7 to the browser console
 
 ```javascript
+// example1.js
 function output(n) {
   console.log(`called with ${n}`)
 }
@@ -61,62 +70,86 @@ output(7);
 ```
 
 <a id="simple_optimization"></a>
-## SIMPLE_OPTIMIZATION
+### SIMPLE_OPTIMIZATION
 
 ```bash
-$ java -jar /home/kireto/local/closure-compiler-v20200830.jar --help
+#
+$ java -jar closure-compiler-v20200830.jar example1.js 
 ```
 
-<a id="simple_optimizations-compiled"></a>
-### SIMPLE_OPTIMIZATIONS compiled
+<a id="simple_optimization-compiled"></a>
+#### SIMPLE_OPTIMIZATION compiled
+
+The output of the compilation is:
 
 ```javascript
 var $jscomp=$jscomp||{};$jscomp.scope={};$jscomp.createTemplateTagFirstArg=function(a){return a.raw=a};$jscomp.createTemplateTagFirstArgWithRaw=function(a,b){a.raw=b;return a};function output(a){console.log("called with "+a)}output(7);
 ```
 
+By default GCC uses SIMPLE_OPTIMIZATION
+
 <a id="simple_optimization-compiled--formatted"></a>
-### SIMPLE_OPTIMIZATION compiled & formatted
+#### SIMPLE_OPTIMIZATION compiled & formatted
 
 ```javascript
+var $jscomp = $jscomp || {};
+$jscomp.scope = {};
+$jscomp.createTemplateTagFirstArg = function(a) {
+    return a.raw = a
+};
+$jscomp.createTemplateTagFirstArgWithRaw = function(a, b) {
+    a.raw = b;
+    return a
+};
+
 function output(a) {
- console.log("called with " + a)
+    console.log("called with " + a)
 }
 output(7);
 ```
 
-1. Резултатът е минифициран
-2. Променливата 'n' вече е с друго име - 'a'
-3. Кодът може да се изпълнява и на по-стари браузъри
-4. Има малко повече код служебен код в началато, който не е толкова интересен
-5. Компилаторът се пуска с java. Има java версия има и javascript версия на компилатора. Версията която аз използваме е 20200830.
-6. https://mvnrepository.com/artifact/com.google.javascript/closure-compiler с първа версия  Dec, 2010 като последните години имат нова версия на всеки 3 седмици
+1. The result from the compiler is minified. There are no comments and whitespaces.
+2. The variable 'n' was renamed to 'a'
+3. The code could be executed on older browsers that do not support ``
+4. There is a little extra code in the beginning, but it is not that interesting
+5. The compiler is started with java. The version of the compiler is 20200830. https://mvnrepository.com/artifact/com.google.javascript/closure-compiler is the repository with first version in 'Dec, 2010'. Currently a new version is released every 3 weeks.
 
 <a id="advanced_optimization"></a>
-## ADVANCED_OPTIMIZATION
+### ADVANCED_OPTIMIZATION
+
+To start the advance compilation use '-O ADVANCED'
 
 ```bash
-$ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example1.js
+$ java -jar closure-compiler-v20200830.jar -O ADVANCED example1.js
 ```
 
 <a id="advanced_optimization-compiled"></a>
-### ADVANCED_OPTIMIZATION compiled
+#### ADVANCED_OPTIMIZATION compiled
+
+The result contains just that:
 
 ```javascript
 console.log("called with 7")
 ```
 
-1. Кодът не е просто минифиран.
-2. Липсва фунцията output. Тя не ни трябва. За браузъра няма значение дали ще има такава функция или не. И в двата случая той ще изкара изпише стринг в конзолата
-3. Няма дефиниця, няма параметър, няма извикване. Директно е свършена работата.
-4. Как сте запазили интелектуалната собственост - ами в компилирания код отсъства разработеният от вас код.
-5. Извикването е по-бързо - няма извикване на функция, няма събиране на низ с число
-6. Взима по-малко памет - една функция по-малко
-7. Въпреки това поведението е запазено.
+<a id="summary"></a>
+### Summary
+
+1. The code is not simple minified. It is completely changed, but the behaviour is the same.
+2. The 'output' function is missing. We might need it as developers, but the browser does not need it.
+3. There is no definition, no param, no call, There is directly the job done. So something that is developer friendly is compiled to something that is browser and machine friendly. 
+4. How do we keep the Intellectual property - the compiled code does not contain our code. It contains our behaviour, but not the code.
+5. Technically speaking the call is a little faster - there is no function and no operation to sum the string with the int. So we are a few thousand CPU cycles faster (at least) 
+6. Technically the program takes less memory - there is one function less.
+7. Despite all that, the behavior is preserved.
 
 <a id="example-2---classes"></a>
-## Example 2 - classes
+## Example 2 - 'classes'
+
+We wanted to use vanilla JS and classes for Instructions Steps Framework, because of the problems we wanted to track down with the IS framework. So here is an example.
 
 ```javascript
+// example2.js
 /**
  * Process all the elements with element name and add the css class to this element.
  * Used as an example in a Google Closure Compiler presentation
@@ -150,16 +183,18 @@ class Processor {
 ```
 
 ```bash
-$ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example2.js 
+$ java -jar closure-compiler-v20200830.jar -O ADVANCED example2.js 
 ```
 
 <a id="advanced_optimization-compiled-1"></a>
 ### ADVANCED_OPTIMIZATION compiled
+
 ```javascript
 
 ```
+The resulting JavaScript file is empty, because we've never called the Processor and its functions. So the browser will never execute this code, and the compiler also does not execute it and produces an empty file.
 
-Причината е, че никъде не сме извикали Processor и неговите функции и компиларотът вижда, че браузърът никога няма да ги изпълни и затова не ги включва в компилирания код.
+This means that any dead code that is not reached is removed from production, which could have great benefits.
 
 <a id="improve-example-2"></a>
 ### Improve example 2
@@ -168,15 +203,15 @@ We add
 
 ```javascript
 
-// add this fragment at the bottom at the second example
+// add this fragment at the bottom at example2.js
 const processor = new Processor("div", "my-class")
 processor.process()
 ```
 
-And execute 
+and execute 
 
 ```bash
-$ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example2.js 
+$ java -jar closure-compiler-v20200830.jar -O ADVANCED example2.js 
 ```
 
 <a id="advanced_optimization-compiled-again"></a>
@@ -199,16 +234,43 @@ document.querySelectorAll("div").forEach(function(a) {
 });
 ```
 
-<a id="what-was-changed"></a>
-### What was changed
+<a id="summary-1"></a>
+### Summary
 
-Какви са промените въведени от компилатора
-1. Не използваме класове
-2. Променливата 'element' вече се казва 'a'
-3. Компилаторът разбира от DOM и знае, че променливата 'а' има метод, който е classList. 
+```javascript
+// original
+class Processor {
+  constructor(elementName, cssClassToAdd) {
+    this._elementName = elementName;
+    this._cssClassToAdd = cssClassToAdd;
+  }
+
+  process() {
+    const elements= document.querySelectorAll(this._elementName)
+    elements.forEach((element)=> {
+      element.classList.add(this._cssClassToAdd)
+    })
+  }
+}
+const processor = new Processor("div", "my-class")
+processor.process()
+
+// compiled & beautified
+document.querySelectorAll("div").forEach(function(a) {
+    a.classList.add("my-class")
+});
+```
+
+What are the changes introduced by the compiler
+
+1. Classes are not used
+2. Variable 'element' is now called 'a'. That is a 7 times reduction in the size required for this one variable.
+3. The compiler knows about the DOM and the DOM APIs and it knows that 'a' is an 'Element' and it has a '.classList' method.. 
 
 <a id="example-3---inheritance"></a>
 ## Example 3 - inheritance
+
+Again we needed a structure of classes in IS, so another example with classes.
 
 ```javascript
 /**
@@ -294,7 +356,7 @@ processor.process()
 ```
 
 ```bash
-$ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example3.js
+$ java -jar closure-compiler-v20200830.jar -O ADVANCED example3.js
 ```
 
 <a id="advanced_optimization-compiled-2"></a>
@@ -384,9 +446,9 @@ document.getElementById("addProcessor") ? r = new n("div", "my-class") : r = new
 r.a();
 ```
 
-В началото има няколко служебни фрагменти свързани с прототипи и наследяване. Javascript е базиран на прототипи, но това не е лекцията на която да разглеждаме прототипи, класове и разликите между тях. 
+There are a couple of fragments in the beginning about protytopes. JavaScript  is based on prototypes, but we are not going to discuss prototype here.
 
-Същината на кода е:
+The main part of the compiled code is:
 
 ```javascript
 function m(a, b) {
@@ -420,12 +482,10 @@ document.getElementById("addProcessor") ? r = new n("div", "my-class") : r = new
 r.a();
 ```
 
-<a id="summary"></a>
+<a id="summary-2"></a>
 ### Summary
 
-Какви промени е направил компилаторът?
-
-1. 'Processor' вече се казва 'm', 'elementName' е казва 'a' и 'cssClassName' се казва 'b'
+1. 'Processor' is now called 'm', 'elementName' is called 'a' and 'cssClassName' is called 'b'.
 
 ```javascript
 // original
@@ -441,7 +501,10 @@ function m(a, b) {
     this.b = b
 }
 ```
+
 2. AddProcessor
+'AddProcessor' is now called 'n', '_elementName' is called 'c' and 'this.cssClassToAdd' is called 'a.b'.
+
 ```javascript
 // original
 class AddProcessor extends Processor {
@@ -502,6 +565,10 @@ q.prototype.a = function() {
 
 4. If statement
 
+- instead of let the compiler uses var
+- instead of if/else it uses ' ? : '
+- instead of calling 'processor.process()' it calls 'r.a()'
+ 
 ```javascript
 // original 
 let processor = null;
@@ -521,7 +588,11 @@ r.a();
 <a id="how-did-the-errors-disappear"></a>
 # How did the errors disappear
 
-Компилаторът предоставя възможност за типизиране чрез коментари. Може да кажем в коментари на кода какви са типовете на получаваните параметри. Тъй като JavaScript по подразбиране е силно нетипизиран и динамичен език това е едно от големите му предимства, но е източник и на доста недостатъци. С Google Closure Compiler намерихме точния баланс. Пишем на vanilla JS, и типизираме където трябва
+Compared to our JS code that we are delivering most of the errors in our IS framework disappeared.
+
+The compiler allow for setting types. In the comments, as an additional meta we could set the types of the params and the compiler would check for them.. 
+
+JavaScript is a dynamic language which is a great advantage, but could also be the source of a lot of challenges. With Google Closure Compiler we found the right balance. We develop in vanilla JS and set the types were we benefit from it.
 
 <a id="types"></a>
 ## Types
@@ -546,15 +617,15 @@ class RemoveProcessor extends Processor {
   }
 }
 
-// we call the constructor method with a wrong type.
+// we call the constructor method with the wrong type.
 processor = new RemoveProcessor("div", 4)
 
 ```
 
-Получаваме забележка от компилатора, че типът ни не е коректен.
+If we try to compile there will be a warning by the compiler.
 
 ```bash
-$ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example4.js 
+$ java -jar closure-compiler-v20200830.jar -O ADVANCED example4.js 
 example4.js:81:41: WARNING - [JSC_TYPE_MISMATCH] actual parameter 2 of RemoveProcessor does not match formal parameter
 found   : number
 required: string
@@ -564,13 +635,13 @@ required: string
 0 error(s), 1 warning(s), 93.2% typed
 ```
 
-Съществуват много типове 
+There are a lot of types in GCC. 
 https://github.com/google/closure-compiler/wiki/Types-in-the-Closure-Type-System
 
 <a id="missing-methods"></a>
 ## Missing methods
 
-Какво ще стане ако се опитаме да извикаме метод който вече не съществува
+What would happen if we try to call a method that does not exist?
 
 ```javascript
 // we call .anotherMethod and .process()
@@ -578,8 +649,10 @@ https://github.com/google/closure-compiler/wiki/Types-in-the-Closure-Type-System
 processor.anotherMethod()
 ```
 
+The compiler will warn us and this method is not defined. Is it really defined?
+
 ```bash
-$ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example5.js 
+$ java -jar closure-compiler-v20200830.jar -O ADVANCED example5.js 
 example5.js:83:10: WARNING - [JSC_INEXISTENT_PROPERTY] Property anotherMethod never defined on (AddProcessor|RemoveProcessor)
   83| processor.anotherMethod()
                 ^^^^^^^^^^^^^
@@ -587,6 +660,10 @@ example5.js:83:10: WARNING - [JSC_INEXISTENT_PROPERTY] Property anotherMethod ne
 
 <a id="invalid-syntax"></a>
 ## Invalid syntax
+
+It could happen. To submit a code with invalide syntax. Generally it our case it happens because we are handling a stack with Ruby, JavaScript, Python, C#. Sometimes in a day you could make three different commits in three different languages. 
+Ruby does not care about '()'. JavaScript cares.
+Ruby does not care about this like .count, .size, .length. They all work.  JavaScript cares. Only one of them works.
 
 ```javascript
 // this code can not be compiled. It is not a valid JavaScript
@@ -598,8 +675,10 @@ example5.js:83:10: WARNING - [JSC_INEXISTENT_PROPERTY] Property anotherMethod ne
   }
 ```
 
+Compiling gives an error as the syntax is not valid. 
+
 ```bash
-$ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED example6.js 
+$ java -jar closure-compiler-v20200830.jar -O ADVANCED example6.js 
 example6.js:72:31: ERROR - [JSC_PARSE_ERROR] Parse error. Semi-colon expected
   72|       element.classList.remove this._cssClassToAdd
                                      ^
@@ -612,37 +691,41 @@ example6.js:72:31: ERROR - [JSC_PARSE_ERROR] Parse error. Semi-colon expected
 
 > More sweat in the training less blood on the ring
 
-Харесва ми динамичната, не типизирана среща, която JavaScript ти предоставя. Това е инструмент, който може да се използва за добри каузи, но също така може да е причина за доста грешки и важното е да се намери баланса.  
+I like the dynamically typed environment of JavaScript. I look at it as a tool that could be used for good causes, but it could also lead to a lot of errors. Balance is what is important.
 
-<a id="how-the-size-of-the-output-reduced"></a>
-# How the size of the output reduced
+<a id="how-the-size-of-the-output-is-reduced-by-gcc"></a>
+# How the size of the output is reduced by GCC
 
-1. The size of the whole IS Framework 
+1. The size of the whole IS Framework  before it is compiled as it is packed in a single file.
 
 ```bash
 $ du is-release_pack-b65ffd509871e122b72cbdfa93e96c47cea2ac0c64b83016bf3b0df14cd99a86.js -b
 586230  is-release_pack-b65ffd509871e122b72cbdfa93e96c47cea2ac0c64b83016bf3b0df14cd99a86.js
 ```
 
-**586230 bytes**
+**586230 bytes** (586K)
 
 2. Number of lines 
+
+It give you an example of large the framework is.
 
 ```bash
 $ wc -l is-release_pack-b65ffd509871e122b72cbdfa93e96c47cea2ac0c64b83016bf3b0df14cd99a86.js
 20646 is-release_pack-b65ffd509871e122b72cbdfa93e96c47cea2ac0c64b83016bf3b0df14cd99a86.js
 ```
 
-**20646 lines of code.**
+**20646 lines of code.** 
 
 3. Uglify JS
+
+By using Uglify JS we are minimizing and uglifying the code. 
 
 ```bash
 $ du is-release_pack-1ce088d0e0f412a627779c10d1248ac0481ea4f687f18e712261c8d29630b7cc.js
 204 is-release_pack-1ce088d0e0f412a627779c10d1248ac0481ea4f687f18e712261c8d29630b7cc.js
 ```
 
-**196964 bytes**
+**196964 bytes** (197K)
 
 4. Google Closure Compiler ADVANCED_OPTIMIZATION
 
@@ -651,7 +734,7 @@ $ du -b is-release_pack-1.1.209.js
 121857  is-release_pack-1.1.209.js
 ```
 
-**121857 bytes**
+**121857 bytes** (122K)
 
 5. Results
 
@@ -661,15 +744,16 @@ $ du -b is-release_pack-1.1.209.js
 | 100%      |  33.59%   |   20,78% of original
 |           |           |   61,86% of Uglify
 
-Доставяме JavaScript, компилиран с GCC, ADVANCED_OPTIMIZATION
- - който и да ни откраднеш, ще ти е трудно да изградиш продукт върху него
- - който работи
- - работи на повече браузъри с 0 усилия от наша страна
- - и е 40% по-малък
- - GCC се поддържа от Google и вероятно няма да изчезне скоро
- - не е сложен за използване, а е просто един компилатор 
- - на всеки 3 седмици излиза нова версия
- - казва се gcc. Какъв по-голям кеф от това да пишеш gcc и да си спомняш за славните времена.
+We deliver JavaScript, compiled with GCC in ADVANCED_OPTIMIZATION mode
+
+ - it is difficult to base a product on it as it is difficult to modify it.
+ - it works
+ - it works and many browsers with 0 efforts from our side
+ - it has 40% smaller size than Uglify
+ - GCC is supported by Google and will probably not disappear soon.
+ - GCC is not complex, it is just a compiler. No configuration, no files, just a command line call.
+ - there is a new GCC version every 3 weeks
+ - the compiler is called 'gcc'. It is pleasing and fun to work with JavaScript and talk about 'gcc' and to remember the glorious times :)
 
 <a id="how-we-build-the-instructions-steps-is-framework"></a>
 # How we build the Instructions Steps (IS) Framework
