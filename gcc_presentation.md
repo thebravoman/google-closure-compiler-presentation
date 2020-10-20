@@ -12,18 +12,18 @@ Kiril Mitov (kmitov [at] axlessoft [dot] com), CTO Axlessoft, October 2020
 
 # Organization Context
 
-We used Google Closure Compiler in the development of the Instructions Steps (IS) framework. IS helped us build buildin3d.com and visualize 3D assembly instructions to end clients. IS has an event-driven plug-in architecture. It consists of 68 plugins. Every plugin is a separate repo with separate release cycle, build and version. Every plugin is written in JavaScript. In total we've released more than 3000 versions of the plugins. The framework is vanialla JS, not event dependent on DOM not to mention jQuery or others. Some extensions depend on Babylon.js, Three.js, Mustache.js and others.
+We used Google Closure Compiler in the development of the Instructions Steps (IS) framework. IS helped us build buildin3d.com and visualize 3D assembly instructions to end clients. IS has an event-driven plug-in architecture. It consists of 68 plugins. Every plugin is a separate repo with separate release cycle, build and version. Every plugin is written in JavaScript. In total we've released more than 3000 versions of the plugins. The framework is written vanilla JS. It is not even dependent on DOM not to mention jQuery or others. Some extensions depend on Babylon.js, Three.js, Mustache.js and others because of the services they provide.
 
-The tools that we used every day   
+The tools that we used every day:
 
-1. Google Closure Compiler  - no code reaches production if it is not compiled.
+1. Google Closure Compiler for compilation - no code reaches production if it is not compiled in an ADVANCED_OPTIMIZATION mode.
 2. Sprockets for packging (deprecated currently, but is working very nice.)
 3. Teaspoon for running specs (the project is looking for maintainers, probably we would take it)
 4. Jasmine for developing specs (a healthy specs framework)
 
 # Personal context
 
-In about a year between 2019-2020 I went from occasionally working with JavaScript when I had to, to one of the very best JavaScript programmers I know of. I hated most steps of the way. At least most steps until I decided to start version 6 of the framework where I completely rewrote it all dropping a lot and basing the framework on vanilla js with es6 classes and no depending even on the DOM. In retrospective GCC was the tool that helped me the most.
+In about a year between 2019-2020 I went from occasionally working with JavaScript when I had to, to one of the very best JavaScript programmers I know of. I hated most steps of the way. At least most steps until I decided to start version 6 of the framework where I completely rewrote it all dropping a lot and basing the framework on vanilla JS with ES6 classes and no depending even on the DOM. In retrospective GCC was the tool that helped me the most.
 
 # Table of contents
 
