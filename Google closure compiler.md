@@ -62,7 +62,7 @@ In about a year between 2019-2020 I went from occasionally working with JavaScri
     - [Building an SDK](#building-an-sdk)
         - [@export the classes](#export-the-classes)
         - [@export the methods](#export-the-methods)
-    - [Drawback of using @export](#drawback-of-using-export)
+    - [Drawbacks of using @export](#drawbacks-of-using-export)
 
 <!-- /MarkdownTOC -->
 
@@ -868,7 +868,7 @@ Don't look at the GCC code and try to write your code in an "pseudo-optimized" w
 
 GCC will remove all the methods that are not called. But if you are building an SDK and would like to provide others with your GCC compiled library most of the methods will not be called. You are providing a library and this library will be used by the clients. Not all the methods will be called by every clients.
 
-This is what export is for. 
+This is what @export annotation is for. 
 
 Let's provide our Add and Remove Processors as a library for others to use.
 
@@ -944,7 +944,7 @@ To compile we must include two new options:
 $ java -jar closure-compiler-v20200830.jar -O ADVANCED --generate_exports --js closure/goog/base.js example3_with_exports.js
 ```
 
-The compiled file is
+The compiled file is:
 
 ```javascript
 //...more
@@ -985,10 +985,10 @@ document.getElementById("addProcessor") ? u = new r("div", "my-class") : u = new
 u.a();
 ```
 
-What you could wee is that it we have the names 'Processor', 'AddProcessor' and 'RemoveProcessor' available as named variabled in the file in we could give someone this file and they can use it to call
+What you could wee is that we have the names 'Processor', 'AddProcessor' and 'RemoveProcessor' available as a form of 'named variables' in the file and we could give this file to someone and they can use it to construct new instances of the classes like;
 
 ```javascript
-const processor = new AddProcessor()
+const processor = new AddProcessor("div", "my-class")
 processor.process()
 ```
 
@@ -1076,7 +1076,7 @@ $ java -jar /home/kireto/local/closure-compiler-v20200830.jar -O ADVANCED --gene
 
 ```
 
-The compiled file is 
+The compiled file is:
 
 ```javascript
 // ... more
@@ -1132,8 +1132,8 @@ u.process();
 1. There is a method 'q.prototype.process'
 2. The call is no londer 'u.a()', but is 'u.process()'
 
-<a id="drawback-of-using-export"></a>
-## Drawback of using @export
+<a id="drawbacks-of-using-export"></a>
+## Drawbacks of using @export
 
 > 'Ideally, the ratio of external symbols to internal code in a binary should be as small as possible. The compiler is much more effective as the "volume" of code increases in comparison to its "surface".'
 
