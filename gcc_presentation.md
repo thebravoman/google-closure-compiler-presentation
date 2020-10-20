@@ -149,7 +149,7 @@ output(7);
 <a id="advanced_optimization"></a>
 ### ADVANCED_OPTIMIZATION
 
-To start the advance compilation use '-O ADVANCED'
+To start the advanced compilation use '-O ADVANCED'
 
 ```bash
 $ java -jar closure-compiler-v20200830.jar -O ADVANCED example1.js
@@ -167,11 +167,11 @@ console.log("called with 7")
 <a id="summary"></a>
 ### Summary
 
-1. The code is not simple minified. It is completely changed, but the behaviour is the same.
-2. The 'output' function is missing. We might need it as developers, but the browser does not need it.
-3. There is no definition, no param, no call, There is directly the job done. So something that is developer friendly is compiled to something that is browser and machine friendly. 
-4. How do we keep the Intellectual property - the compiled code does not contain our code. It contains our behaviour, but not the code.
-5. Technically speaking the call is a little faster - there is no function and no operation to sum the string with the int. So we are a few thousand CPU cycles faster (at least) 
+1. The code is not simply minified. It is completely changed, but the behavior is the same.
+2. The 'output' function is missing. We might need it as developers, but the browser does not need it at runtime.
+3. There is no definition, no param, no call. There is directly the 'job done'. So something that is 'developer friendly' is compiled to something that is 'browser and machine friendly'. 
+4. How do we protect the Intellectual property - the compiled code does not contain our code. It contains our behaviour, but not the code.
+5. Technically speaking the call is a little faster - there is no function and no operation to sum the string with the number. So we are a few thousands of CPU cycles faster (at least). 
 6. Technically the program takes less memory - there is one function less.
 7. Despite all that, the behavior is preserved.
 
@@ -221,9 +221,12 @@ $ java -jar closure-compiler-v20200830.jar -O ADVANCED example2.js
 <a id="advanced_optimization-compiled-1"></a>
 ### ADVANCED_OPTIMIZATION compiled
 
+The file is empty:
+
 ```javascript
 
 ```
+
 The resulting JavaScript file is empty, because we've never called the Processor and its functions. So the browser will never execute this code, and the compiler also does not execute it and produces an empty file.
 
 This means that any dead code that is not reached is removed from production, which could have great benefits.
@@ -234,7 +237,6 @@ This means that any dead code that is not reached is removed from production, wh
 We add
 
 ```javascript
-
 // add this fragment at the bottom at example2.js
 const processor = new Processor("div", "my-class")
 processor.process()
@@ -296,13 +298,13 @@ document.querySelectorAll("div").forEach(function(a) {
 What are the changes introduced by the compiler
 
 1. Classes are not used
-2. Variable 'element' is now called 'a'. That is a 7 times reduction in the size required for this one variable.
-3. The compiler knows about the DOM and the DOM APIs and it knows that 'a' is an 'Element' and it has a '.classList' method.. 
+2. Variable 'element' is now called 'a'. That is a 7 times reduction in the size required for the name of this one variable.
+3. The compiler knows about the DOM and the DOM APIs and it knows that 'a' is an 'Element' and it has a '.classList' method.
 
 <a id="example-3---inheritance"></a>
 ## Example 3 - inheritance
 
-Again we needed a structure of classes in IS, so another example with classes.
+We needed a structure of classes in IS, so another example with classes.
 
 ```javascript
 /**
@@ -478,7 +480,7 @@ document.getElementById("addProcessor") ? r = new n("div", "my-class") : r = new
 r.a();
 ```
 
-There are a couple of fragments in the beginning about protytopes. JavaScript  is based on prototypes, but we are not going to discuss prototype here.
+There are a couple of fragments in the beginning about protytopes. JavaScript  is based on prototypes, but we are not going to discuss prototypes here.
 
 The main part of the compiled code is:
 
@@ -535,6 +537,7 @@ function m(a, b) {
 ```
 
 2. AddProcessor
+
 'AddProcessor' is now called 'n', '_elementName' is called 'c' and 'this.cssClassToAdd' is called 'a.b'.
 
 ```javascript
@@ -597,9 +600,9 @@ q.prototype.a = function() {
 
 4. If statement
 
-- instead of let the compiler uses var
-- instead of if/else it uses ' ? : '
-- instead of calling 'processor.process()' it calls 'r.a()'
+- instead of _let_ the compiler uses _var_
+- instead of _if/else_ it uses _' ? : '_
+- instead of calling '_processor.process()_' it calls '_r.a()_'
  
 ```javascript
 // original 
@@ -620,9 +623,9 @@ r.a();
 <a id="how-did-the-errors-disappear"></a>
 # How did the errors disappear
 
-Compared to our JS code that we are delivering most of the errors in our IS framework disappeared.
+Compared to JS code written by us that we are delivering in other platforms most of the errors in our IS framework disappeared with the use of GCC.
 
-The compiler allow for setting types. In the comments, as an additional meta we could set the types of the params and the compiler would check for them.. 
+The compiler allow for setting types. In the comments, as an additional meta in the form of an annotation we could set the types of the params and the compiler would check for them. 
 
 JavaScript is a dynamic language which is a great advantage, but could also be the source of a lot of challenges. With Google Closure Compiler we found the right balance. We develop in vanilla JS and set the types were we benefit from it.
 
