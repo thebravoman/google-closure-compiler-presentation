@@ -787,7 +787,7 @@ We deliver JavaScript, compiled with GCC in ADVANCED_OPTIMIZATION mode
 <a id="example-1-from-is"></a>
 ## Example 1 from IS
 
-I have not idea what this code does and what is the original code.
+I have no idea what this code does and what is the original code.
 
 ```javascript
     function Sa(b) {
