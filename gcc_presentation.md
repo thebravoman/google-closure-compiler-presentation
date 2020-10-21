@@ -10,6 +10,8 @@ Get in touch or follow me:
 
 [linkedin/kirilmitov](https://www.linkedin.com/in/kirilmitov/)
 
+[blog](https://www.kmitov.com)
+
 # Quote to begin with 
 
 > "If the human body was making a new organ every week, doctors would be googling this shit."
@@ -18,7 +20,7 @@ Get in touch or follow me:
 
 # Organization Context
 
-We used Google Closure Compiler in the development of the Instructions Steps (IS) framework. IS helped us build buildin3d.com and visualize 3D assembly instructions to end clients. IS has an event-driven plug-in architecture. It consists of 68 plugins. Every plugin is a separate repo with separate release cycle, build and version. Every plugin is written in JavaScript. In total we've released more than 3000 versions of the plugins. The framework is written vanilla JS. It is not even dependent on DOM not to mention jQuery or others. Some extensions depend on Babylon.js, Three.js, Mustache.js and others because of the services they provide.
+We used Google Closure Compiler in the development of the Instructions Steps (IS) framework. IS helped us build buildin3d.com and visualize 3D assembly instructions to end clients. IS has an event-driven plug-in architecture. It consists of 68 plugins. Every plugin is a separate repo with separate release cycle, build and version. Every plugin is written in JavaScript. In total we've released more than 3000 versions of the plugins. The framework is written in vanilla JS. It is not even dependent on DOM not to mention jQuery or others. Some extensions depend on Babylon.js, Three.js, Mustache.js and others because of the services they provide.
 
 The tools that we used every day:
 
